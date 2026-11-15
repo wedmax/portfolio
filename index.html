@@ -98,7 +98,7 @@
             <h2 class="text-4xl font-bold text-center mb-12 text-white">
                 Selected <span class="text-indigo-400">Projects</span>
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
                 <!-- Project Card 1: Close-Out -->
                 <div
@@ -388,6 +388,63 @@
                 document.body.classList.remove('cursor-hover');
             });
         });
+    </script>
+
+<!-- Dynamic Projects Loader -->
+    <script>
+        async function loadDynamicProjects() {
+            const grid = document.getElementById("projects-grid");
+            if (!grid) return;
+
+            try {
+                // Cache-busting query ensures newly published entries show up immediately
+                const response = await fetch(`projects.json?t=${Date.now()}`);
+                if (!response.ok) return;
+
+                const projects = await response.json();
+                if (!Array.isArray(projects) || projects.length === 0) return;
+
+                // Render newest entries first at the top of the existing grid
+                projects.slice().reverse().forEach(project => {
+                    const encodedTitle = encodeURIComponent(project.title || "Project");
+                    const imgSrc = project.image || `https://placehold.co/600x400/030712/4f46e5?text=${encodedTitle}`;
+                    
+                    const tagsHtml = (project.tags || [])
+                        .map(tag => `<span class="inline-block bg-gray-700 text-gray-200 text-xs px-3 py-1 rounded-full mr-1 mb-1">${tag}</span>`)
+                        .join("");
+
+                    const linkHtml = project.link
+                        ? `<div class="mt-3"><a href="${project.link}" target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:text-indigo-300 text-sm font-medium">View Project &rarr;</a></div>`
+                        : "";
+
+                    const card = document.createElement("div");
+                    card.className = "bg-gray-800/50 backdrop-blur-lg border border-gray-700/30 rounded-2xl shadow-2xl overflow-hidden transform hover:scale-105 transition-transform duration-300";
+                    card.innerHTML = `
+                        <img src="${imgSrc}" alt="${project.title}" class="w-full h-56 object-cover"
+                            onerror="this.src='https://placehold.co/600x400/030712/ffffff?text=Image+Not+Found'">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-white mb-2">${project.title}</h3>
+                            <p class="text-indigo-400 text-sm font-medium mb-4">${project.role}</p>
+                            <p class="text-gray-300 text-sm mb-4">${project.description}</p>
+                            <div>${tagsHtml}</div>
+                            ${linkHtml}
+                        </div>
+                    `;
+
+                    grid.prepend(card);
+                });
+
+                // Re-bind custom cursor hover effects to newly injected links
+                grid.querySelectorAll('a').forEach(el => {
+                    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+                    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+                });
+            } catch (err) {
+                console.error("Failed to load projects.json:", err);
+            }
+        }
+
+        loadDynamicProjects();
     </script>
 
 </body>
