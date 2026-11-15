@@ -1,9 +1,24 @@
 [
   {
+    "id": "proj-title-or-name",
+    "title": "Proj Title or Name",
+    "role": "the role",
+    "tags": [
+      "tag1",
+      "tag2",
+      "tag3"
+    ],
+    "description": "Lorem Ipsum Description whatever."
+  },
+  {
     "id": "close-out",
     "title": "Close-Out",
     "role": "Game Designer & Technical Artist",
     "description": "Solo-developed interactive game project.",
-    "tags": ["Blender", "Interactive", "Game Design"]
+    "tags": [
+      "Blender",
+      "Interactive",
+      "Game Design"
+    ]
   }
 ]
